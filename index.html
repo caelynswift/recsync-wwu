@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RecSync — WWU Recreation Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#003F6B;
+  --navy-dark:#002D4E;
+  --navy-deeper:#001E35;
+  --teal:#007A8C;
+  --teal-light:#009BB0;
+  --gold:#C2D400;
+  --gold-light:#D1E600;
+  --white:#FFFFFF;
+  --off-white:#F5F6F7;
+  --gray-light:#EAECEE;
+  --gray:#D0D4D8;
+  --gray-mid:#8A9299;
+  --ink:#1A1E22;
+  --ink2:#3D4449;
+  --ink3:#6B7280;
+  --border:#D0D4D8;
+  --low-bg:#EAF5EA;--low:#1B5E20;
+  --med-bg:#FFF8E1;--med:#7B5800;
+  --high-bg:#FDE8E8;--high:#B71C1C;
+  --r:4px;--r-md:6px;--r-lg:8px;
+}
+body{font-family:'Source Sans 3',sans-serif;background:var(--off-white);color:var(--ink);min-height:100vh;font-size:16px;line-height:1.6}
+h1,h2,h3,h4{font-family:'Source Serif 4',serif;line-height:1.25}
+
+/* ─── TOP UTILITY BAR ─── */
+.utility-bar{background:var(--navy-deeper);padding:6px 0;font-size:12px;color:rgba(255,255,255,0.7)}
+.utility-inner{max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;justify-content:space-between;align-items:center}
+.utility-links{display:flex;gap:16px}
+.utility-links a{color:rgba(255,255,255,0.7);text-decoration:none;font-size:12px;transition:color .15s}
+.utility-links a:hover{color:#fff}
+
+/* ─── MAIN NAV ─── */
+.main-nav{background:var(--navy);position:sticky;top:0;z-index:300;box-shadow:0 2px 8px rgba(0,0,0,0.25)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;height:64px;gap:0}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:2rem;flex-shrink:0}
+.nav-logo-mark{width:44px;height:44px;background:var(--gold);border-radius:2px;display:flex;align-items:center;justify-content:center;font-family:'Source Serif 4',serif;font-weight:700;font-size:14px;color:var(--navy-deeper);line-height:1;text-align:center;letter-spacing:-0.5px}
+.nav-logo-text{color:#fff;font-family:'Source Serif 4',serif;font-size:15px;font-weight:600;line-height:1.2}
+.nav-logo-text small{display:block;font-family:'Source Sans 3',sans-serif;font-weight:300;font-size:11px;color:rgba(255,255,255,0.65);letter-spacing:0.5px}
+.nav-tabs{display:flex;gap:0;flex:1}
+.nav-tab{color:rgba(255,255,255,0.75);font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:500;padding:0 14px;height:64px;display:flex;align-items:center;cursor:pointer;border:none;background:none;transition:all .15s;border-bottom:3px solid transparent;white-space:nowrap}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.nav-tab.active{color:#fff;border-bottom-color:var(--gold);background:rgba(255,255,255,0.06)}
+.nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.nav-avatar-wrap{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.8);font-size:13px}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--gold);color:#1A1E22;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;font-family:'Source Sans 3',sans-serif;border:2px solid rgba(255,255,255,0.3)}
+
+/* ─── PAGES ─── */
+.page{display:none;padding:2rem 0;animation:fadeup .25s ease}
+.page.on{display:block}
+.page-inner{max-width:1200px;margin:0 auto;padding:0 1.5rem}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── PAGE TITLE BAR ─── */
+.page-title-bar{background:var(--navy);color:#fff;padding:2rem 0;margin-bottom:2rem}
+.page-title-bar .page-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem}
+.page-title-bar h1{font-size:clamp(22px,3vw,32px);font-weight:600;color:#fff}
+.page-title-bar p{color:rgba(255,255,255,0.75);font-size:15px;margin-top:4px;font-family:'Source Sans 3',sans-serif;font-weight:300}
+.breadcrumb{font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:4px;font-family:'Source Sans 3',sans-serif}
+.breadcrumb span{color:rgba(255,255,255,0.4)}
+
+/* ─── HOME HERO ─── */
+.hero{position:relative;background:var(--navy);color:#fff;overflow:hidden;padding:0}
+.hero-img{width:100%;height:420px;object-fit:cover;display:block;opacity:0.4;filter:brightness(.85)}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,31,53,.92) 0%,rgba(0,47,78,.7) 50%,rgba(0,47,78,.2) 100%)}
+.hero-content{position:absolute;inset:0;display:flex;align-items:center;padding:0 3rem;max-width:700px}
+.hero-inner{position:relative}
+.hero-eyebrow{font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);margin-bottom:10px}
+.hero h1{font-size:clamp(28px,4vw,46px);font-weight:700;line-height:1.15;color:#fff;margin-bottom:14px}
+.hero h1 em{color:var(--gold-light);font-style:normal}
+.hero p{font-size:17px;color:rgba(255,255,255,0.82);max-width:500px;font-weight:300;margin-bottom:24px}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border-radius:var(--r);font-family:'Source Sans 3',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .18s;border:none;line-height:1;text-decoration:none}
+.btn-gold{background:var(--gold);color:#111}
+.btn-gold:hover{background:var(--gold-light)}
+.btn-outline-white{background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.6)}
+.btn-outline-white:hover{background:rgba(255,255,255,0.1);border-color:#fff}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:var(--navy-dark)}
+.btn-outline-navy{background:#fff;color:var(--navy);border:2px solid var(--navy)}
+.btn-outline-navy:hover{background:var(--off-white)}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-teal:hover{background:var(--teal-light)}
+.btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--gray-light)}
+.btn-sm{padding:7px 14px;font-size:13px}
+
+/* ─── HOME SECTIONS ─── */
+.home-band{padding:3rem 0}
+.home-band.gray{background:var(--gray-light)}
+.home-band.navy{background:var(--navy);color:#fff}
+.band-inner{max-width:1200px;margin:0 auto;padding:0 1.5rem}
+.section-label{font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.section-label.light{color:var(--gold-light)}
+.section-h2{font-size:clamp(22px,3vw,32px);font-weight:600;margin-bottom:8px}
+.section-sub{font-size:16px;color:var(--ink2);max-width:600px;font-weight:300}
+.section-sub.light{color:rgba(255,255,255,0.75)}
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;margin-top:1.5rem}
+.feature-tile{background:#fff;padding:1.5rem;transition:background .15s}
+.feature-tile:hover{background:#f8fafc}
+.tile-icon{width:40px;height:40px;background:var(--navy);border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:var(--gold-light);font-size:20px;margin-bottom:12px}
+.feature-tile h3{font-size:16px;font-weight:600;margin-bottom:6px;color:var(--navy)}
+.feature-tile p{font-size:14px;color:var(--ink2);line-height:1.5;font-weight:300}
+.stat-band{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--navy-dark);border-radius:var(--r-md);overflow:hidden;margin-top:1.5rem}
+.stat-tile{padding:1.5rem 2rem;border-right:1px solid rgba(255,255,255,0.1);text-align:center}
+.stat-tile:last-child{border-right:none}
+.stat-num{font-family:'Source Serif 4',serif;font-size:36px;font-weight:700;color:var(--gold-light);line-height:1}
+.stat-desc{font-size:13px;color:rgba(255,255,255,0.65);margin-top:4px;font-weight:300}
+
+/* ─── CARDS / FORMS ─── */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1rem}
+.card h3{font-size:18px;font-weight:600;color:var(--navy);margin-bottom:1rem}
+.card-sm h3{font-size:16px;margin-bottom:.75rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fg{margin-bottom:1rem}
+.fg:last-child{margin-bottom:0}
+label.lbl{font-size:13px;font-weight:600;color:var(--ink2);display:block;margin-bottom:5px;letter-spacing:0.2px}
+select,input[type=text],input[type=email]{width:100%;height:42px;border:1px solid var(--border);border-radius:var(--r);padding:0 12px;font-family:'Source Sans 3',sans-serif;font-size:15px;background:#fff;color:var(--ink);transition:border .15s,box-shadow .15s}
+select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,122,140,.12)}
+
+/* ─── SCENARIOS ─── */
+.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
+.scenario-card{background:#fff;border:2px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;cursor:pointer;transition:all .18s}
+.scenario-card:hover,.scenario-card.active{border-color:var(--navy);background:var(--off-white)}
+.scenario-card h4{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:4px}
+.scenario-card p{font-size:13px;color:var(--ink2);line-height:1.4;font-weight:300}
+.s-badge{display:inline-block;background:var(--navy);color:var(--gold-light);font-size:10px;font-weight:700;padding:2px 7px;border-radius:2px;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+
+/* ─── HEATMAP ─── */
+.heatmap-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);overflow-x:auto;padding:1.25rem}
+table.heatmap{border-collapse:separate;border-spacing:3px;width:100%;min-width:620px}
+.heatmap th{font-size:11px;font-weight:600;color:var(--ink3);text-align:center;padding:2px 4px;font-family:'Source Sans 3',sans-serif}
+.heatmap td.cell{width:50px;height:38px;border-radius:var(--r);text-align:center;font-size:12px;font-weight:600;cursor:default;transition:transform .12s,opacity .12s;vertical-align:middle;font-family:'Source Sans 3',sans-serif}
+.heatmap td.cell:hover{transform:scale(1.15);z-index:5;position:relative}
+.heatmap td.day{font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;color:var(--navy);text-align:right;padding-right:10px;white-space:nowrap;width:70px}
+.hm-legend{display:flex;gap:16px;margin-top:12px;font-size:12px;color:var(--ink2);align-items:center}
+.hm-swatch{width:16px;height:16px;border-radius:var(--r)}
+
+/* ─── STATS ─── */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
+.stat-box{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:1rem 1.25rem;border-left:4px solid var(--navy)}
+.stat-box .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:4px;font-family:'Source Sans 3',sans-serif}
+.stat-box .val{font-family:'Source Serif 4',serif;font-size:30px;font-weight:700;color:var(--navy);line-height:1}
+.stat-box .sub{font-size:12px;color:var(--ink2);margin-top:3px;font-weight:300}
+
+/* ─── RECOMMENDATIONS ─── */
+.rec-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:12px;display:grid;grid-template-columns:60px 1fr auto;gap:1.25rem;align-items:start;border-left:4px solid var(--navy)}
+.rec-rank{font-family:'Source Serif 4',serif;font-size:42px;font-weight:700;color:var(--gold);line-height:1}
+.rec-day{font-family:'Source Serif 4',serif;font-size:22px;font-weight:600;color:var(--navy);margin-bottom:2px}
+.rec-time{font-size:14px;color:var(--ink2);margin-bottom:8px;font-weight:300}
+.rec-explanation{font-size:14px;color:var(--ink2);line-height:1.6;background:var(--off-white);border-radius:var(--r);padding:10px 12px;margin-bottom:10px;border-left:3px solid var(--teal)}
+.rec-equip{display:flex;gap:6px;flex-wrap:wrap}
+.etag{font-size:12px;background:var(--navy);color:rgba(255,255,255,0.9);padding:3px 9px;border-radius:2px;font-weight:500;font-family:'Source Sans 3',sans-serif}
+.crowd-ring{width:72px;height:72px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Source Serif 4',serif;flex-shrink:0;border:3px solid}
+.crowd-num{font-size:22px;font-weight:700;line-height:1}
+.crowd-lbl{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-family:'Source Sans 3',sans-serif}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:var(--r);font-size:12px;font-weight:600;font-family:'Source Sans 3',sans-serif}
+.bg-low{background:var(--low-bg);color:var(--low)}
+.bg-med{background:var(--med-bg);color:var(--med)}
+.bg-high{background:var(--high-bg);color:var(--high)}
+
+/* ─── ABOUT ─── */
+.about-s{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1rem}
+.about-s h3{font-size:20px;font-weight:600;color:var(--navy);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:2px solid var(--gold)}
+.about-s p,.about-s li{font-size:15px;color:var(--ink2);line-height:1.7;margin-bottom:6px;font-weight:300}
+.about-s ul{padding-left:1.3rem}
+.about-s strong{font-weight:600;color:var(--ink)}
+.flow-diagram{display:flex;align-items:stretch;gap:0;margin-top:1rem;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.flow-node{flex:1;padding:1rem .75rem;text-align:center;background:var(--off-white);border-right:1px solid var(--border)}
+.flow-node:last-child{border-right:none}
+.flow-node.navy{background:var(--navy);color:#fff}
+.flow-node.teal{background:var(--teal);color:#fff}
+.flow-node.gold{background:var(--gold);color:#111}
+.flow-node .f-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;opacity:.65;margin-bottom:4px;font-family:'Source Sans 3',sans-serif}
+.flow-node .f-title{font-family:'Source Serif 4',serif;font-size:14px;font-weight:600;line-height:1.3}
+.flow-node .f-sub{font-size:11px;opacity:.75;margin-top:3px;font-weight:300;font-family:'Source Sans 3',sans-serif}
+
+/* ─── FOOTER ─── */
+.site-footer{background:var(--navy-deeper);color:rgba(255,255,255,0.75);padding:2.5rem 0 1.5rem;margin-top:3rem}
+.footer-inner{max-width:1200px;margin:0 auto;padding:0 1.5rem}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr;gap:2rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(255,255,255,0.1)}
+.footer-brand h3{font-family:'Source Serif 4',serif;color:#fff;font-size:18px;font-weight:600;margin-bottom:6px}
+.footer-brand p{font-size:13px;line-height:1.6;font-weight:300}
+.footer-col h4{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-light);margin-bottom:10px;font-family:'Source Sans 3',sans-serif}
+.footer-col a{display:block;font-size:13px;color:rgba(255,255,255,0.6);text-decoration:none;margin-bottom:5px;transition:color .15s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{padding-top:1.25rem;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:rgba(255,255,255,0.4);flex-wrap:wrap;gap:8px}
+.footer-bottom a{color:rgba(255,255,255,0.4);text-decoration:none}
+.footer-bottom a:hover{color:rgba(255,255,255,0.7)}
+.tribal{background:rgba(255,255,255,0.04);border-radius:var(--r-md);padding:12px 14px;margin-bottom:1.5rem;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;border-left:3px solid var(--gold)}
+
+/* ─── PROFILE BANNER ─── */
+.profile-banner{background:var(--off-white);border:1px solid var(--border);border-radius:var(--r-lg);padding:10px 16px;margin-bottom:1rem;font-size:14px;color:var(--ink2);display:flex;align-items:center;gap:10px}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--navy);color:#fff;padding:12px 18px;border-radius:var(--r-lg);font-size:14px;display:flex;align-items:center;gap:8px;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none;border-left:4px solid var(--gold);max-width:320px;font-family:'Source Sans 3',sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.toast.show{transform:translateY(0);opacity:1}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.divider{height:1px;background:var(--border);margin:1.25rem 0}
+@media(max-width:640px){.form-row,.stat-row,.scenario-grid,.two-col,.footer-top{grid-template-columns:1fr}.stat-band{grid-template-columns:1fr}.rec-card{grid-template-columns:auto 1fr}.crowd-ring{display:none}.nav-tab{font-size:12px;padding:0 8px}}
+
+.pt{background:#fff;border:2px solid var(--border);border-radius:var(--r-lg);padding:1.25rem 1.5rem;margin-bottom:4px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all .18s}
+.pt:hover{border-color:var(--teal)}.pt.open{border-color:var(--navy);background:var(--off-white)}
+.pt h3{font-size:17px;font-weight:600;color:var(--navy);margin:0;display:flex;align-items:center;gap:10px}
+.pt-a{font-size:20px;color:var(--ink3);transition:transform .2s;line-height:1}.pt.open .pt-a{transform:rotate(180deg)}
+.ps{display:none;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-lg) var(--r-lg);background:#fff;padding:1.5rem;margin-bottom:1rem}
+.ps.open{display:block}
+.pg{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.pl{background:var(--gray-light);border:1.5px solid transparent;border-radius:100px;padding:6px 14px;font-size:13px;cursor:pointer;transition:all .18s;user-select:none;font-weight:500}
+.pl:hover{border-color:var(--teal);color:var(--teal)}.pl.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ss{margin-bottom:1.25rem}.sl{font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:6px}.sq{font-size:13px;color:var(--ink3);font-weight:300;margin-bottom:4px}
+.mc{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem 1.5rem;margin-bottom:12px;transition:border .18s}.mc:hover{border-color:var(--teal)}
+.ma{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Source Serif 4',serif;font-weight:700;font-size:18px;flex-shrink:0;color:#fff}
+.mn{font-family:'Source Serif 4',serif;font-size:20px;font-weight:600;color:var(--navy)}
+.mm{font-size:13px;color:var(--ink3);font-weight:300;margin-top:1px}
+.mp{font-family:'Source Serif 4',serif;font-size:26px;font-weight:700;color:var(--lime);line-height:1;text-align:right}
+.mp small{display:block;font-family:'Source Sans 3',sans-serif;font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px}
+.at{font-size:12px;background:var(--low-bg);color:var(--low);padding:3px 9px;border-radius:var(--r);font-weight:600}
+.od{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:4px}
+.mb0{position:fixed;inset:0;background:rgba(0,15,30,.6);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
+.mb0.open{display:flex}.mw{background:#fff;border-radius:var(--r-lg);width:100%;max-width:520px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.mh{background:var(--navy);padding:1.25rem 1.5rem;display:flex;align-items:flex-start;justify-content:space-between}
+.mh h3{color:#fff;font-size:18px;font-weight:600;margin:0}.mh p{color:rgba(255,255,255,.65);font-size:13px;margin-top:2px;font-weight:300}
+.mx{background:none;border:none;color:rgba(255,255,255,.7);font-size:24px;cursor:pointer;line-height:1;padding:2px 4px;margin-left:12px}.mx:hover{color:#fff}
+.mb2{padding:1.5rem}.mf{padding:.75rem 1.5rem 1.25rem;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border)}
+.ch{max-height:200px;overflow-y:auto;margin-bottom:1rem;border:1px solid var(--border);border-radius:var(--r);padding:.75rem;background:var(--off-white)}
+.cm{margin-bottom:8px}.cm.s{text-align:right}
+.cb{display:inline-block;padding:6px 12px;border-radius:12px;font-size:14px;max-width:80%;line-height:1.5;word-break:break-word}
+.cb.s{background:var(--navy);color:#fff;border-bottom-right-radius:3px}.cb.r{background:#fff;color:var(--ink);border:1px solid var(--border);border-bottom-left-radius:3px}
+.ct{font-size:11px;color:var(--ink3);margin-top:2px}
+</style>
+</head>
+<body>
+
+<!-- UTILITY BAR -->
+<div class="utility-bar">
+  <div class="utility-inner">
+    <div class="utility-links">
+      <a href="#">myWestern</a>
+      <a href="#">Canvas</a>
+      <a href="#">Directory</a>
+      <a href="#">Campus Map</a>
+    </div>
+    <div class="utility-links">
+      <a href="#">WWU Recreation Center</a>
+      <a href="#">Student Services</a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN NAV -->
+<nav class="main-nav">
+  <div class="nav-inner">
+    <div class="nav-logo" onclick="go('home')" style="cursor:pointer">
+      <div class="nav-logo-mark">WWU</div>
+      <div class="nav-logo-text">RecSync<small>Recreation Center</small></div>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="go('home')">Home</button>
+      <button class="nav-tab" onclick="go('profile')">My Profile</button>
+      <button class="nav-tab" onclick="go('dashboard')">Crowd Dashboard</button>
+      <button class="nav-tab" onclick="go('recs')">Recommendations</button>
+      <button class="nav-tab" onclick="go('partners')">Find Partners</button><button class="nav-tab" onclick="go('about')">About</button>
+    </div>
+    <div class="nav-right">
+      <div class="nav-avatar-wrap">
+        <div class="nav-avatar" id="nav-init">?</div>
+        <span id="nav-nm" style="display:none"></span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HOME ═══ -->
+<div class="page on" id="pg-home">
+  <div class="hero" style="height:420px;position:relative">
+    <img class="hero-img" src="https://www.wwu.edu/sites/default/files/styles/banner_larger/public/2026-03/cherry%20web%202.jpg?itok=Yi36nYPB" alt="WWU campus" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.45">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-inner">
+        <div class="hero-eyebrow">WWU Recreation Center</div>
+        <h1>Train smarter.<br><em>Make Waves.</em></h1>
+        <p>Beat the crowds, find the right time to train, and connect with fellow Vikings who share your goals.</p>
+        <div class="hero-btns">
+          <button class="btn btn-gold" onclick="go('profile')">Get My Recommendations</button>
+          <button class="btn btn-outline-white" onclick="go('dashboard')">View Crowd Heatmap</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="home-band">
+    <div class="band-inner">
+      <div class="section-label">What RecSync Does</div>
+      <h2 class="section-h2">Your personal guide to the Rec Center</h2>
+      <p class="section-sub">Powered by visit data from 300 member sessions across 180 days. Built for Western Washington University students.</p>
+      <div class="feature-grid">
+        <div class="feature-tile">
+          <div class="tile-icon">&#128200;</div>
+          <h3>Crowd Forecasting</h3>
+          <p>Color-coded hourly predictions for every day of the week — so you can plan around the rush or lean in.</p>
+        </div>
+        <div class="feature-tile">
+          <div class="tile-icon">&#127947;</div>
+          <h3>Equipment Intelligence</h3>
+          <p>See which free weights, machines, and cardio equipment tend to be available at your preferred time.</p>
+        </div>
+        <div class="feature-tile">
+          <div class="tile-icon">&#127919;</div>
+          <h3>Smart Recommendations</h3>
+          <p>Tell us your schedule and preferences — RecSync surfaces your top 3 optimal time slots with explanations.</p>
+        </div>
+        <div class="feature-tile">
+          <div class="tile-icon">&#128101;</div>
+          <h3>Viking Community</h3>
+          <p>Opt in to find students with matching goals and schedules. New to campus? Find your gym crew.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="home-band navy">
+    <div class="band-inner">
+      <div class="section-label light">By the Numbers</div>
+      <h2 class="section-h2" style="color:#fff">Built on real patterns</h2>
+      <div class="stat-band">
+        <div class="stat-tile"><div class="stat-num">300</div><div class="stat-desc">synthetic member visits analyzed</div></div>
+        <div class="stat-tile"><div class="stat-num">17</div><div class="stat-desc">hourly slots tracked per day</div></div>
+        <div class="stat-tile"><div class="stat-num">0–100</div><div class="stat-desc">congestion score, every slot</div></div>
+      </div>
+      <div style="margin-top:1.5rem;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-gold" onclick="go('profile')">Start with my profile &#8594;</button>
+        <button class="btn btn-outline-white" onclick="go('about')">How it works</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="home-band gray">
+    <div class="band-inner">
+      <div class="section-label">Demo Scenarios</div>
+      <h2 class="section-h2">See it in action</h2>
+      <p class="section-sub" style="margin-bottom:1.25rem">Jump in with a pre-built profile and see how recommendations shift.</p>
+      <div class="scenario-grid">
+        <div class="scenario-card" onclick="loadAndGo('morning')">
+          <div class="s-badge">Scenario A</div>
+          <h4>Morning Free Weights</h4>
+          <p>Avoids crowds. Prefers free weights early AM before class. Intermediate lifter.</p>
+          <div style="margin-top:10px"><span class="btn btn-sm btn-navy">Load scenario &#8594;</span></div>
+        </div>
+        <div class="scenario-card" onclick="loadAndGo('evening')">
+          <div class="s-badge">Scenario B</div>
+          <h4>Evening Machines</h4>
+          <p>Fine with a busy gym. Uses cable machines and leg press after 4pm on weekdays.</p>
+          <div style="margin-top:10px"><span class="btn btn-sm btn-navy">Load scenario &#8594;</span></div>
+        </div>
+        <div class="scenario-card" onclick="loadAndGo('saturday')">
+          <div class="s-badge">Scenario C</div>
+          <h4>Weekend Cardio Beginner</h4>
+          <p>New to the Rec. Wants cardio on Saturday mornings, low pressure environment.</p>
+          <div style="margin-top:10px"><span class="btn btn-sm btn-navy">Load scenario &#8594;</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PROFILE ═══ -->
+<div class="page" id="pg-profile">
+  <div class="page-title-bar">
+    <div class="page-inner">
+      <div>
+        <div class="breadcrumb">RecSync <span>&#8250;</span> My Profile</div>
+        <h1>My Profile</h1>
+        <p>Enter your preferences to receive personalized Rec Center recommendations.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-inner">
+    <div style="margin-bottom:1rem">
+      <p style="font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:8px">&#9889;&nbsp; Quick start with a demo scenario</p>
+      <div class="scenario-grid" id="scenario-grid">
+        <div class="scenario-card" onclick="loadScenario('morning')"><div class="s-badge">Scenario A</div><h4>Morning Free Weights</h4><p>Avoids crowds, early AM, intermediate.</p></div>
+        <div class="scenario-card" onclick="loadScenario('evening')"><div class="s-badge">Scenario B</div><h4>Evening Machines</h4><p>Fine with crowds, 4pm+, advanced.</p></div>
+        <div class="scenario-card" onclick="loadScenario('saturday')"><div class="s-badge">Scenario C</div><h4>Weekend Cardio Beginner</h4><p>Saturday mornings, cardio, low pressure.</p></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Account Information</h3>
+      <div class="form-row">
+        <div class="fg"><label class="lbl">First name</label><input type="text" id="p-name" placeholder="Alex"></div>
+        <div class="fg"><label class="lbl">WWU student email</label><input type="email" id="p-email" placeholder="a.viking@wwu.edu"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label class="lbl">Age range</label><select id="p-age"><option value="">Select</option><option>18–20</option><option>21–24</option><option>25–29</option><option>30+</option></select></div>
+        <div class="fg"><label class="lbl">Experience level</label><select id="p-exp"><option value="">Select</option><option>beginner</option><option>intermediate</option><option>advanced</option></select></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Workout Preferences</h3>
+      <div class="form-row">
+        <div class="fg"><label class="lbl">Equipment preference</label><select id="p-equip"><option>Free weights</option><option>Machines</option><option>Cardio only</option><option>Mixed</option><option>Bodyweight</option></select></div>
+        <div class="fg"><label class="lbl">Workout style</label><select id="p-style"><option>High intensity</option><option>Moderate pace</option><option>Low and slow</option><option>Circuit training</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label class="lbl">Preferred time of day</label><select id="p-time"><option>Early morning (6–8am)</option><option>Morning (8–10am)</option><option>Midday (10am–1pm)</option><option>Afternoon (1–4pm)</option><option>Evening (4–7pm)</option><option>Late evening (7–10pm)</option></select></div>
+        <div class="fg"><label class="lbl">Crowd tolerance</label><select id="p-crowd"><option value="low">Low — prefer it quiet</option><option value="any">Any — doesn't matter</option><option value="high">High — love the energy</option></select></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-gold" onclick="runRecommend()">Get My Recommendations &#8594;</button>
+      <button class="btn btn-ghost" onclick="go('dashboard')">View heatmap first</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="page" id="pg-dashboard">
+  <div class="page-title-bar">
+    <div class="page-inner">
+      <div>
+        <div class="breadcrumb">RecSync <span>&#8250;</span> Crowd Dashboard</div>
+        <h1>Crowd Dashboard</h1>
+        <p>Hourly congestion scores (0–100) across every day of the week, based on 300 member visits.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-inner">
+    <div class="stat-row">
+      <div class="stat-box"><div class="lbl">Busiest slot</div><div class="val" id="busiest-val">—</div><div class="sub" id="busiest-lbl">Loading…</div></div>
+      <div class="stat-box"><div class="lbl">Quietest slot</div><div class="val" id="quiet-val">—</div><div class="sub" id="quiet-lbl">Loading…</div></div>
+      <div class="stat-box"><div class="lbl">Avg weekday 4–6 PM</div><div class="val" id="peak-val">—</div><div class="sub">Peak evening window</div></div>
+    </div>
+    <div class="heatmap-wrap">
+      <table class="heatmap" id="heatmap"></table>
+      <div class="hm-legend">
+        <span class="hm-swatch" style="background:#2e7d32"></span><span>Quiet (0–33)</span>
+        <span class="hm-swatch" style="background:#e65100;margin-left:10px"></span><span>Moderate (34–66)</span>
+        <span class="hm-swatch" style="background:#b71c1c;margin-left:10px"></span><span>Busy (67–100)</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--ink3)">Hover a cell for details</span>
+      </div>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card card-sm" style="margin-bottom:0"><h3>5 Least Busy Slots</h3><div id="least-list"></div></div>
+      <div class="card card-sm" style="margin-bottom:0"><h3>5 Busiest Slots</h3><div id="most-list"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RECOMMENDATIONS ═══ -->
+<div class="page" id="pg-recs">
+  <div class="page-title-bar">
+    <div class="page-inner">
+      <div>
+        <div class="breadcrumb">RecSync <span>&#8250;</span> Recommendations</div>
+        <h1>Your Recommendations</h1>
+        <p>Top 3 time slots matched to your schedule, equipment needs, and crowd preferences.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-inner">
+    <div class="profile-banner" id="rec-banner">
+      No profile set. <button class="btn btn-ghost btn-sm" onclick="go('profile')" style="margin-left:8px">Set profile &#8594;</button>
+    </div>
+    <div id="rec-list"></div>
+    <div id="rec-method" style="display:none" class="card" style="margin-top:1rem">
+      <h3>How these recommendations are calculated</h3>
+      <p style="font-size:14px;color:var(--ink2);line-height:1.6;font-weight:300">Each time slot is scored across three dimensions: <strong style="color:var(--ink)">time match</strong> (how well the slot aligns with your stated preference), <strong style="color:var(--ink)">crowd fit</strong> (adjusted by your tolerance — quiet preference means low-congestion slots score higher, crowd-lover preference inverts this), and <strong style="color:var(--ink)">equipment availability</strong> (based on observed utilization rates at that hour). The three unique days with the highest combined scores are returned.</p>
+      <div class="divider"></div>
+      <p style="font-size:13px;color:var(--ink3);line-height:1.6;font-weight:300"><strong style="color:var(--ink2)">Honest limitations:</strong> This model is trained on synthetic data and doesn't reflect real-time scans, WWU finals week, quarter transitions, or class-schedule-driven patterns. It performs best for users with consistent preferences and standard schedules. One-off situations and edge cases won't be well-represented.</p>
+    </div>
+  </div>
+</div>
+
+
+<div class="page" id="pg-partners">
+  <div class="ptb"><div class="page-inner">
+    <div><div class="breadcrumb">RecSync <span>&#8250;</span> Find Partners</div>
+    <h1>Find a Workout Partner</h1><p>Answer a few questions and we'll match you with fellow Vikings.</p></div>
+  </div></div>
+  <div class="page-inner">
+    <div class="pt" id="st" onclick="tS()">
+      <h3>&#128101;&nbsp; Partner Preference Survey</h3><span class="pt-a">&#8964;</span>
+    </div>
+    <div class="ps" id="psrv">
+      <div class="form-row" style="margin-bottom:1.25rem">
+        <div class="fg"><label class="lbl">Your first name (shown to matches)</label><input type="text" id="s-name" placeholder="Alex"></div>
+        <div class="fg"><label class="lbl">Your gender identity</label><select id="s-mg"><option value="">Select</option><option value="male">Man</option><option value="female">Woman</option><option value="non-binary">Non-binary</option><option value="other">Prefer not to say</option></select></div>
+      </div>
+      <div class="ss"><div class="sl">&#9899; Who would you like to work out with?</div>
+        <div class="pg" id="pg-gender">
+          <div class="pl" onclick="sp(this,'pg-gender',1)">Any gender &#8212; open to all</div>
+          <div class="pl" onclick="sp(this,'pg-gender',1)">Women only</div>
+          <div class="pl" onclick="sp(this,'pg-gender',1)">Men only</div>
+          <div class="pl" onclick="sp(this,'pg-gender',1)">Non-binary / gender-diverse</div>
+          <div class="pl" onclick="sp(this,'pg-gender',1)">No strong preference</div>
+        </div></div>
+      <div class="ss"><div class="sl">&#8987; How long are your typical sessions?</div>
+        <div class="pg" id="pg-dur">
+          <div class="pl" onclick="sp(this,'pg-dur',1)">30-45 min</div><div class="pl" onclick="sp(this,'pg-dur',1)">45-60 min</div><div class="pl" onclick="sp(this,'pg-dur',1)">60-75 min</div><div class="pl" onclick="sp(this,'pg-dur',1)">75-90 min</div><div class="pl" onclick="sp(this,'pg-dur',1)">90+ min</div>
+        </div></div>
+      <div class="ss"><div class="sl">&#127775; How would you describe your social energy?</div>
+        <div class="sq">Helps us find someone whose vibe matches yours.</div>
+        <div class="pg" id="pg-soc">
+          <div class="pl" onclick="sp(this,'pg-soc',1)">Very extroverted &#8212; I love meeting people</div>
+          <div class="pl" onclick="sp(this,'pg-soc',1)">Somewhat extroverted</div>
+          <div class="pl" onclick="sp(this,'pg-soc',1)">Ambivert &#8212; depends on the day</div>
+          <div class="pl" onclick="sp(this,'pg-soc',1)">Somewhat introverted</div>
+          <div class="pl" onclick="sp(this,'pg-soc',1)">Very introverted &#8212; quiet and focused</div>
+        </div></div>
+      <div class="ss"><div class="sl">&#128172; How much do you like to chat during workouts?</div>
+        <div class="pg" id="pg-chat">
+          <div class="pl" onclick="sp(this,'pg-chat',1)">Love chatting between sets</div>
+          <div class="pl" onclick="sp(this,'pg-chat',1)">A bit of conversation is nice</div>
+          <div class="pl" onclick="sp(this,'pg-chat',1)">Mostly focused, some chat</div>
+          <div class="pl" onclick="sp(this,'pg-chat',1)">I prefer to stay in the zone</div>
+        </div></div>
+      <div class="ss"><div class="sl">&#127939; What workout styles are you looking for? <span style="font-weight:300;font-size:12px">(select all that apply)</span></div>
+        <div class="pg" id="pg-sty">
+          <div class="pl" onclick="sp(this,'pg-sty',0)">High intensity</div><div class="pl" onclick="sp(this,'pg-sty',0)">Moderate pace</div><div class="pl" onclick="sp(this,'pg-sty',0)">Chill and social</div><div class="pl" onclick="sp(this,'pg-sty',0)">Circuit training</div><div class="pl" onclick="sp(this,'pg-sty',0)">Solo focused</div>
+        </div></div>
+      <div class="ss"><div class="sl">&#127925; Music vibe</div>
+        <div class="pg" id="pg-mus">
+          <div class="pl" onclick="sp(this,'pg-mus',1)">Hype/EDM</div><div class="pl" onclick="sp(this,'pg-mus',1)">Hip-hop</div><div class="pl" onclick="sp(this,'pg-mus',1)">Rock/metal</div><div class="pl" onclick="sp(this,'pg-mus',1)">Pop</div><div class="pl" onclick="sp(this,'pg-mus',1)">Podcasts/audiobooks</div><div class="pl" onclick="sp(this,'pg-mus',1)">No preference</div>
+        </div></div>
+      <div class="ss"><div class="sl">&#128170; How often do you go to the gym?</div>
+        <div class="pg" id="pg-con">
+          <div class="pl" onclick="sp(this,'pg-con',1)">Every day</div><div class="pl" onclick="sp(this,'pg-con',1)">5-6x per week</div><div class="pl" onclick="sp(this,'pg-con',1)">3-4x per week</div><div class="pl" onclick="sp(this,'pg-con',1)">1-2x per week</div><div class="pl" onclick="sp(this,'pg-con',1)">Whenever I can</div>
+        </div></div>
+      <div class="ss"><div class="sl">&#128336; Preferred time <span style="font-weight:300;font-size:12px">(select all that apply)</span></div>
+        <div class="pg" id="pg-tim">
+          <div class="pl" onclick="sp(this,'pg-tim',0)">Early morning (6-8am)</div><div class="pl" onclick="sp(this,'pg-tim',0)">Morning (8-10am)</div><div class="pl" onclick="sp(this,'pg-tim',0)">Midday (10am-1pm)</div><div class="pl" onclick="sp(this,'pg-tim',0)">Afternoon (1-4pm)</div><div class="pl" onclick="sp(this,'pg-tim',0)">Evening (4-7pm)</div><div class="pl" onclick="sp(this,'pg-tim',0)">Late evening (7-10pm)</div><div class="pl" onclick="sp(this,'pg-tim',0)">Any time works</div>
+        </div></div>
+      <div style="margin-top:1.5rem;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-lime" onclick="rPM()">&#128101; Find My Matches</button>
+        <button class="btn btn-ghost" onclick="clrS()">Clear survey</button>
+      </div>
+    </div>
+    <div id="mr" style="display:none;margin-top:.5rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+        <h2 style="font-size:20px;font-weight:600;font-family:'Source Serif 4',serif;color:var(--navy)">Your Top Matches</h2>
+        <span id="mc" style="font-size:13px;color:var(--ink3)"></span>
+      </div>
+      <div id="ml"></div>
+    </div>
+  </div>
+</div>
+
+<div class="mb0" id="msgm">
+  <div class="mw">
+    <div class="mh"><div><h3 id="mt">Message</h3><p id="msb"></p></div><button class="mx" onclick="cM()">&#215;</button></div>
+    <div class="mb2">
+      <div class="ch" id="chist"></div>
+      <div class="fg"><label class="lbl">Your message</label><textarea id="mi" placeholder="Hey! I saw we matched on RecSync..." rows="3" style="padding:10px 12px;resize:vertical"></textarea></div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost btn-sm" onclick="cM()">Cancel</button><button class="btn btn-navy btn-sm" onclick="sM()">Send Message</button></div>
+  </div>
+</div>
+
+<!-- ═══ ABOUT ═══ -->
+<div class="page" id="pg-about">
+  <div class="page-title-bar">
+    <div class="page-inner">
+      <div>
+        <div class="breadcrumb">RecSync <span>&#8250;</span> About</div>
+        <h1>About RecSync</h1>
+        <p>MIS 432 — AI in Business &nbsp;&#8226;&nbsp; Western Washington University &nbsp;&#8226;&nbsp; 2025</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-inner">
+    <div class="about-s">
+      <h3>Project Overview</h3>
+      <p>RecSync is a data-driven gym companion built for Western Washington University students. It combines crowd forecasting with preference-based recommendations to help Vikings — especially those new to campus — make the most of the Bellingham Recreation Center.</p>
+      <p>The system addresses a real gap: new students are often hesitant to visit the Rec Center because they don't know what to expect. RecSync reduces that friction with transparent, data-backed predictions and optional partner matching.</p>
+    </div>
+
+    <div class="about-s">
+      <h3>AI Factory Diagram</h3>
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:0">System flow: Data → Model → Prediction → Decision → Value</p>
+      <div class="flow-diagram">
+        <div class="flow-node"><div class="f-label">Data</div><div class="f-title">300 Visit Records</div><div class="f-sub">50 member profiles</div></div>
+        <div class="flow-node navy"><div class="f-label">Process</div><div class="f-title">Congestion Scoring</div><div class="f-sub">Hourly aggregation</div></div>
+        <div class="flow-node teal"><div class="f-label">Model</div><div class="f-title">Preference Matching</div><div class="f-sub">3-factor scoring</div></div>
+        <div class="flow-node gold"><div class="f-label">Output</div><div class="f-title">Top 3 Slots</div><div class="f-sub">+ explanations</div></div>
+        <div class="flow-node"><div class="f-label">Value</div><div class="f-title">Better Gym Visits</div><div class="f-sub">Reduced friction</div></div>
+      </div>
+    </div>
+
+    <div class="about-s">
+      <h3>System Type</h3>
+      <p><strong>Recommendation system:</strong> Matches student preferences (time of day, equipment type, crowd tolerance) against per-hour congestion forecasts to surface optimal gym windows.</p>
+      <p><strong>Forecasting model:</strong> Aggregates 300 synthetic visit records into average member counts per hour block, normalized into a 0–100 congestion score for each day-hour combination.</p>
+    </div>
+
+    <div class="about-s">
+      <h3>Demo Scenario Results</h3>
+      <ul>
+        <li><strong>Morning free weights, avoids crowds (Scenario A):</strong> System recommends Tuesday and Friday 8–9am — both show congestion under 25. Squat racks and dumbbell areas are historically underutilized at those hours. Strong time match, maximum crowd score for low tolerance.</li>
+        <li><strong>Evening machines, fine with crowds (Scenario B):</strong> Recommends Wednesday and Monday 5–6pm — peak congestion (67–88), which scores well for high-tolerance users. Cable machines and leg press show moderate utilization.</li>
+        <li><strong>Saturday beginner cardio (Scenario C):</strong> Recommends Saturday 8am — treadmills and ellipticals free before the weekend mid-morning surge. Saturday peaks at 11am–2pm; the 8am window is consistently the quietest entry point.</li>
+      </ul>
+      <div class="divider"></div>
+      <p><strong>Where it works well:</strong> Consistent schedules, equipment-specific preferences, crowd-sensitive users, students planning their first visit.</p>
+      <p><strong>Where it falls short:</strong> Real-time availability, special events, finals week patterns, highly variable schedules, or users whose goals change week-to-week. The synthetic data doesn't capture seasonal WWU patterns.</p>
+    </div>
+
+    <div class="about-s">
+      <h3>Privacy & Data</h3>
+      <ul>
+        <li>All visit data used in RecSync is <strong>synthetic</strong> — generated to reflect realistic WWU Rec Center traffic patterns, not sourced from real student records.</li>
+        <li>No real student data, ID scan records, or personally identifiable information is used or stored.</li>
+        <li>Profile information entered into RecSync exists only in your browser session and is never transmitted to a server.</li>
+        <li>Workout goals are used internally for recommendation scoring only — they are never displayed on partner-facing cards.</li>
+        <li>A production deployment would require IRB approval, FERPA compliance review, and formal data sharing agreements with the WWU Recreation Center.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="tribal">Western Washington University's main campus is situated on the ancestral homelands of the Coast Salish Peoples, who have lived in the Salish Sea basin, throughout the San Juan Islands and the North Cascades watershed from time immemorial.</div>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h3>RecSync — WWU Recreation Center</h3>
+        <p>A student-built AI tool for smarter gym visits at Western Washington University. Built for MIS 432 — AI in Business, 2025.</p>
+        <p style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.35)">This is a course project and is not an official WWU application.</p>
+      </div>
+      <div class="footer-col">
+        <h4>RecSync</h4>
+        <a href="#" onclick="go('home');return false">Home</a>
+        <a href="#" onclick="go('profile');return false">My Profile</a>
+        <a href="#" onclick="go('dashboard');return false">Crowd Dashboard</a>
+        <a href="#" onclick="go('recs');return false">Recommendations</a>
+        <a href="#" onclick="go('about');return false">About</a>
+      </div>
+      <div class="footer-col">
+        <h4>WWU Links</h4>
+        <a href="https://www.wwu.edu" target="_blank">wwu.edu</a>
+        <a href="https://recreation.wwu.edu" target="_blank">Recreation Center</a>
+        <a href="https://mywestern.wwu.edu" target="_blank">myWestern</a>
+        <a href="https://www.wwu.edu/privacy" target="_blank">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&#169; Western Washington University — RecSync is a student project, not an official WWU service.</span>
+      <span><a href="#">Accessibility</a> &nbsp;&#8226;&nbsp; <a href="#">Privacy</a> &nbsp;&#8226;&nbsp; <a href="#">Report a Concern</a></span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast">&#10003;&nbsp;<span id="toast-msg"></span></div>
+
+<script>
+const CONGESTION = {"Monday": {"6": 0, "7": 0, "8": 77, "9": 23, "10": 23, "11": 0, "12": 12, "13": 23, "14": 0, "15": 23, "16": 33, "17": 88, "18": 67, "19": 12, "20": 44, "21": 12, "22": 23}, "Tuesday": {"6": 12, "7": 0, "8": 23, "9": 0, "10": 12, "11": 33, "12": 23, "13": 23, "14": 0, "15": 12, "16": 67, "17": 44, "18": 67, "19": 33, "20": 33, "21": 23, "22": 12}, "Wednesday": {"6": 12, "7": 0, "8": 23, "9": 12, "10": 0, "11": 35, "12": 70, "13": 12, "14": 35, "15": 23, "16": 93, "17": 47, "18": 47, "19": 23, "20": 23, "21": 58, "22": 23}, "Thursday": {"6": 23, "7": 12, "8": 33, "9": 23, "10": 0, "11": 33, "12": 0, "13": 0, "14": 12, "15": 33, "16": 56, "17": 44, "18": 67, "19": 23, "20": 56, "21": 44, "22": 0}, "Friday": {"6": 21, "7": 30, "8": 0, "9": 0, "10": 9, "11": 21, "12": 40, "13": 21, "14": 9, "15": 9, "16": 60, "17": 60, "18": 30, "19": 30, "20": 21, "21": 40, "22": 21}, "Saturday": {"6": 0, "7": 0, "8": 21, "9": 74, "10": 33, "11": 53, "12": 63, "13": 33, "14": 12, "15": 53, "16": 33, "17": 21, "18": 21, "19": 42, "20": 33, "21": 0, "22": 0}, "Sunday": {"6": 0, "7": 0, "8": 33, "9": 67, "10": 56, "11": 100, "12": 12, "13": 23, "14": 100, "15": 44, "16": 33, "17": 23, "18": 23, "19": 0, "20": 12, "21": 0, "22": 0}};
+const HOURS = [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22];
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const DAY_SHORT = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+const TIME_HOURS = {
+  'Early morning (6\u20138am)':[6,7],
+  'Morning (8\u201310am)':[8,9],
+  'Midday (10am\u20131pm)':[10,11,12],
+  'Afternoon (1\u20134pm)':[13,14,15],
+  'Evening (4\u20137pm)':[16,17,18],
+  'Late evening (7\u201310pm)':[19,20,21],
+};
+const EQUIP_MAP = {
+  'Free weights':['Dumbbell Rack','Squat Rack','Bench Press','Kettlebell Area'],
+  'Machines':['Cable Machine','Leg Press','Lat Pulldown','Chest Press Machine'],
+  'Cardio only':['Treadmill','Elliptical','Stationary Bike','Rowing Machine'],
+  'Mixed':['Dumbbell Rack','Treadmill','Cable Machine'],
+  'Bodyweight':['Pull-up Bar','Ab Bench'],
+};
+
+let userProfile = null;
+
+function hLabel(h){return `${h%12||12}${h<12?'am':'pm'}`}
+
+function cColor(s){
+  if(s<=33){
+    const t=s/33;
+    const r=Math.round(46+t*20),g=Math.round(125+t*30),b=Math.round(50+t*10);
+    return `rgb(${r},${g},${b})`;
+  } else if(s<=66){
+    const t=(s-34)/32;
+    const r=Math.round(180+t*50),g=Math.round(100-t*30),b=20;
+    return `rgb(${r},${g},${b})`;
+  } else {
+    const t=(s-67)/33;
+    const r=Math.round(160+t*23),g=Math.round(40-t*10),b=Math.round(30-t*5);
+    return `rgb(${r},${g},${b})`;
+  }
+}
+function cBadge(s){return s<=33?'bg-low':s<=66?'bg-med':'bg-high'}
+function cLabel(s){return s<=33?'Quiet':s<=66?'Moderate':'Busy'}
+
+function go(p){
+  document.querySelectorAll('.page').forEach(e=>e.classList.remove('on'));
+  document.querySelectorAll('.nav-tab').forEach(e=>e.classList.remove('active'));
+  const map={home:'pg-home',profile:'pg-profile',dashboard:'pg-dashboard',recs:'pg-recs',partners:'pg-partners',about:'pg-about'};
+  document.getElementById(map[p]).classList.add('on');
+  const idx=['home','profile','dashboard','recs','partners','about'].indexOf(p);
+  if(idx>=0)document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  if(p==='dashboard')buildHeatmap();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function buildHeatmap(){
+  const tbl=document.getElementById('heatmap');
+  let html='<tr><td class="day" style="background:transparent"></td>';
+  HOURS.forEach(h=>html+=`<th style="font-size:11px;font-weight:600;color:var(--ink3);padding:2px 3px">${hLabel(h)}</th>`);
+  html+='</tr>';
+  let all=[];
+  DAYS.forEach((day,di)=>{
+    html+=`<tr><td class="day">${DAY_SHORT[di]}</td>`;
+    HOURS.forEach(h=>{
+      const s=CONGESTION[day][String(h)]||0;
+      all.push({day,h,s});
+      const bg=cColor(s);
+      const tc=s>45?'#fff':'rgba(0,0,0,0.85)';
+      html+=`<td class="cell" style="background:${bg};color:${tc}" title="${day} ${hLabel(h)}: ${s}/100 — ${cLabel(s)}">${s}</td>`;
+    });
+    html+='</tr>';
+  });
+  tbl.innerHTML=html;
+  const sorted=[...all].sort((a,b)=>b.s-a.s);
+  const busiest=sorted[0];
+  const quietest=all.filter(c=>c.s>0).sort((a,b)=>a.s-b.s)[0]||sorted[sorted.length-1];
+  document.getElementById('busiest-val').textContent=busiest.s;
+  document.getElementById('busiest-lbl').textContent=`${busiest.day}, ${hLabel(busiest.h)}`;
+  document.getElementById('quiet-val').textContent=quietest.s;
+  document.getElementById('quiet-lbl').textContent=`${quietest.day}, ${hLabel(quietest.h)}`;
+  let sum=0,n=0;
+  ['Monday','Tuesday','Wednesday','Thursday','Friday'].forEach(d=>{
+    [16,17,18].forEach(h=>{sum+=CONGESTION[d][String(h)]||0;n++;});
+  });
+  document.getElementById('peak-val').textContent=Math.round(sum/n);
+  const least=all.filter(c=>c.s>0).sort((a,b)=>a.s-b.s).slice(0,5);
+  const most=[...all].sort((a,b)=>b.s-a.s).slice(0,5);
+  const mkList=(items,id)=>{
+    document.getElementById(id).innerHTML=items.map(c=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:14px">${c.day}, ${hLabel(c.h)}</span>
+        <span class="badge ${cBadge(c.s)}">${c.s}/100</span>
+      </div>`).join('');
+  };
+  mkList(least,'least-list');
+  mkList(most,'most-list');
+}
+
+function recommend(profile){
+  const prefHours=TIME_HOURS[profile.time]||[16,17,18];
+  const crowd=profile.crowd||'any';
+  const equipList=EQUIP_MAP[profile.equip]||EQUIP_MAP['Mixed'];
+  let candidates=[];
+  DAYS.forEach(day=>{
+    HOURS.forEach(h=>{
+      const s=CONGESTION[day][String(h)]||0;
+      const timeBonus=prefHours.includes(h)?25:(Math.abs(Math.min(...prefHours)-h)<=2?12:0);
+      let crowdScore;
+      if(crowd==='low')crowdScore=Math.max(0,40-s);
+      else if(crowd==='high')crowdScore=Math.min(40,Math.round(s/2.5));
+      else crowdScore=20-Math.abs(s-50)/2;
+      const total=Math.round(timeBonus+crowdScore+15);
+      candidates.push({day,h,s,total,equipList});
+    });
+  });
+  candidates.sort((a,b)=>b.total-a.total);
+  const seen=new Set();
+  return candidates.filter(c=>{if(seen.has(c.day))return false;seen.add(c.day);return true}).slice(0,3);
+}
+
+function explain(r,profile){
+  const pref=profile.time;
+  const crowd=profile.crowd;
+  const inPref=(TIME_HOURS[pref]||[]).includes(r.h);
+  const cDesc=r.s<=33?'very quiet (congestion '+r.s+'/100)':r.s<=66?'moderately busy ('+r.s+'/100)':'quite busy ('+r.s+'/100)';
+  let parts=[];
+  if(inPref)parts.push(`Falls within your preferred window (${pref}).`);
+  else parts.push(`Slightly outside your preferred window but a strong overall fit.`);
+  parts.push(`The gym is typically ${cDesc} at this time.`);
+  if(crowd==='low'&&r.s<=33)parts.push('This is one of the quieter slots in the week — ideal for your low-crowd preference.');
+  else if(crowd==='high'&&r.s>=60)parts.push('The higher traffic here aligns well with your preference for an energetic atmosphere.');
+  else if(crowd==='any')parts.push('Crowd level is acceptable across all tolerance preferences.');
+  return parts.join(' ');
+}
+
+function runRecommend(){
+  const name=document.getElementById('p-name').value.trim()||'Viking';
+  const profile={
+    name,
+    time:document.getElementById('p-time').value,
+    equip:document.getElementById('p-equip').value,
+    crowd:document.getElementById('p-crowd').value,
+    style:document.getElementById('p-style').value,
+    exp:document.getElementById('p-exp').value,
+  };
+  userProfile=profile;
+  const init=(name.charAt(0)||'V').toUpperCase()+(name.split(' ')[1]?.[0]||'').toUpperCase();
+  document.getElementById('nav-init').textContent=init;
+  document.getElementById('nav-nm').textContent=name;
+  document.getElementById('nav-nm').style.display='';
+  const recs=recommend(profile);
+  document.getElementById('rec-banner').innerHTML=`
+    <strong>${profile.name}</strong> &nbsp;&#8226;&nbsp; ${profile.time} &nbsp;&#8226;&nbsp; ${profile.equip} &nbsp;&#8226;&nbsp; Crowd tolerance: ${profile.crowd}
+    <button class="btn btn-ghost btn-sm" onclick="go('profile')" style="margin-left:8px">Edit</button>`;
+  document.getElementById('rec-list').innerHTML=recs.map((r,i)=>`
+    <div class="rec-card">
+      <div class="rec-rank" style="color:${i===0?'var(--gold)':i===1?'var(--navy)':'var(--ink3)'}">${i+1}</div>
+      <div>
+        <div class="rec-day">${r.day}</div>
+        <div class="rec-time">at ${hLabel(r.h)} &nbsp;&#8226;&nbsp; <span class="badge ${cBadge(r.s)}">${r.s}/100 &mdash; ${cLabel(r.s)}</span></div>
+        <div class="rec-explanation">${explain(r,profile)}</div>
+        <div class="rec-equip">${r.equipList.map(e=>`<span class="etag">${e}</span>`).join('')}</div>
+      </div>
+      <div class="crowd-ring" style="border-color:${cColor(r.s)};color:${r.s>45?cColor(r.s):'var(--ink)'}">
+        <div class="crowd-num">${r.s}</div>
+        <div class="crowd-lbl">crowd</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('rec-method').style.display='block';
+  go('recs');
+  showToast(`Recommendations ready for ${profile.name}!`);
+}
+
+const SCENARIOS={
+  morning:{name:'Alex M.',time:'Morning (8\u201310am)',equip:'Free weights',crowd:'low',style:'High intensity',exp:'intermediate'},
+  evening:{name:'Jordan T.',time:'Evening (4\u20137pm)',equip:'Machines',crowd:'high',style:'Moderate pace',exp:'advanced'},
+  saturday:{name:'Riley P.',time:'Morning (8\u201310am)',equip:'Cardio only',crowd:'low',style:'Low and slow',exp:'beginner'},
+};
+
+function loadScenario(type){
+  const p=SCENARIOS[type];
+  document.getElementById('p-name').value=p.name;
+  document.getElementById('p-time').value=p.time;
+  document.getElementById('p-equip').value=p.equip;
+  document.getElementById('p-crowd').value=p.crowd;
+  document.getElementById('p-style').value=p.style;
+  document.getElementById('p-exp').value=p.exp;
+  document.querySelectorAll('#scenario-grid .scenario-card').forEach((c,i)=>{
+    const active=['morning','evening','saturday'][i]===type;
+    c.style.borderColor=active?'var(--navy)':'var(--border)';
+    c.style.background=active?'var(--off-white)':'#fff';
+  });
+  showToast(`Scenario loaded: ${p.name}`);
+}
+
+function loadAndGo(type){
+  loadScenario(type);
+  go('profile');
+  setTimeout(runRecommend, 200);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+buildHeatmap();
+
+const STUDENTS = [{"id": 1002, "first": "Chloe", "gender": "female", "year": "Junior", "major": "Education", "goal": "Lose weight", "equipment": "Machines", "preferred_time": "Morning (8-10am)", "workout_style": "High intensity", "social_style": "Very extroverted", "duration": "45-60 min", "music": "No preference", "chat_style": "I prefer to stay in the zone", "spotting": "Prefer not to spot others", "consistency": "Whenever I can", "gender_pref": "Any gender"}, {"id": 1004, "first": "Emma", "gender": "female", "year": "Junior", "major": "Nursing", "goal": "Flexibility & mobility", "equipment": "Free weights", "preferred_time": "Midday (10am-1pm)", "workout_style": "Solo focused", "social_style": "Very extroverted", "duration": "75-90 min", "music": "Podcasts/audiobooks", "chat_style": "A bit of conversation is nice", "spotting": "Always happy to spot", "consistency": "Whenever I can", "gender_pref": "Women only"}, {"id": 1028, "first": "Riley", "gender": "non-binary", "year": "Freshman", "major": "Political Science", "goal": "Increase strength", "equipment": "Mixed", "preferred_time": "Midday (10am-1pm)", "workout_style": "Circuit training", "social_style": "Very introverted", "duration": "30-45 min", "music": "Hip-hop", "chat_style": "Mostly focused, some chat", "spotting": "Prefer not to spot others", "consistency": "5-6x per week", "gender_pref": "Any gender"}, {"id": 1006, "first": "Grace", "gender": "female", "year": "Senior", "major": "Business Administration", "goal": "Increase strength", "equipment": "Free weights", "preferred_time": "Morning (8-10am)", "workout_style": "Chill and social", "social_style": "Very introverted", "duration": "30-45 min", "music": "Hype/EDM", "chat_style": "I prefer to stay in the zone", "spotting": "Sometimes, if asked", "consistency": "1-2x per week", "gender_pref": "No preference"}, {"id": 1001, "first": "Brianna", "gender": "female", "year": "Freshman", "major": "Sociology", "goal": "Build muscle", "equipment": "Mixed", "preferred_time": "Morning (8-10am)", "workout_style": "Moderate pace", "social_style": "Very introverted", "duration": "75-90 min", "music": "Hip-hop", "chat_style": "Mostly focused, some chat", "spotting": "Sometimes, if asked", "consistency": "Every day", "gender_pref": "Any gender"}, {"id": 1018, "first": "Ethan", "gender": "male", "year": "Freshman", "major": "Education", "goal": "Increase strength", "equipment": "Bodyweight", "preferred_time": "Late evening (7-10pm)", "workout_style": "High intensity", "social_style": "Somewhat extroverted", "duration": "75-90 min", "music": "Hip-hop", "chat_style": "Mostly focused, some chat", "spotting": "Sometimes, if asked", "consistency": "1-2x per week", "gender_pref": "Any gender"}, {"id": 1023, "first": "Jake", "gender": "male", "year": "Senior", "major": "Political Science", "goal": "Build muscle", "equipment": "Mixed", "preferred_time": "Evening (4-7pm)", "workout_style": "Chill and social", "social_style": "Somewhat introverted", "duration": "75-90 min", "music": "Pop", "chat_style": "A bit of conversation is nice", "spotting": "Sometimes, if asked", "consistency": "1-2x per week", "gender_pref": "No preference"}, {"id": 1022, "first": "Isaac", "gender": "male", "year": "Freshman", "major": "Nursing", "goal": "General fitness", "equipment": "Free weights", "preferred_time": "Midday (10am-1pm)", "workout_style": "Chill and social", "social_style": "Somewhat extroverted", "duration": "30-45 min", "music": "Rock/metal", "chat_style": "I prefer to stay in the zone", "spotting": "Sometimes, if asked", "consistency": "Whenever I can", "gender_pref": "No preference"}, {"id": 1027, "first": "Noah", "gender": "male", "year": "Freshman", "major": "Education", "goal": "Increase strength", "equipment": "Machines", "preferred_time": "Morning (8-10am)", "workout_style": "Solo focused", "social_style": "Very extroverted", "duration": "75-90 min", "music": "Hype/EDM", "chat_style": "I prefer to stay in the zone", "spotting": "Always happy to spot", "consistency": "Every day", "gender_pref": "Any gender"}, {"id": 1026, "first": "Marcus", "gender": "male", "year": "Freshman", "major": "Nursing", "goal": "Improve cardio", "equipment": "Cardio", "preferred_time": "Midday (10am-1pm)", "workout_style": "High intensity", "social_style": "Ambivert", "duration": "45-60 min", "music": "Hip-hop", "chat_style": "Mostly focused, some chat", "spotting": "Sometimes, if asked", "consistency": "Every day", "gender_pref": "Men only"}, {"id": 1017, "first": "Derek", "gender": "male", "year": "Freshman", "major": "Communication", "goal": "Lose weight", "equipment": "Free weights", "preferred_time": "Late evening (7-10pm)", "workout_style": "Chill and social", "social_style": "Very introverted", "duration": "60-75 min", "music": "No preference", "chat_style": "A bit of conversation is nice", "spotting": "Prefer not to spot others", "consistency": "Every day", "gender_pref": "Any gender"}, {"id": 1013, "first": "Natalie", "gender": "female", "year": "Senior", "major": "Political Science", "goal": "General fitness", "equipment": "Bodyweight", "preferred_time": "Afternoon (1-4pm)", "workout_style": "Solo focused", "social_style": "Very introverted", "duration": "75-90 min", "music": "Rock/metal", "chat_style": "I prefer to stay in the zone", "spotting": "Prefer not to spot others", "consistency": "Whenever I can", "gender_pref": "No preference"}, {"id": 1000, "first": "Aisha", "gender": "female", "year": "Junior", "major": "Biology", "goal": "Lose weight", "equipment": "Machines", "preferred_time": "Early morning (6-8am)", "workout_style": "Chill and social", "social_style": "Somewhat introverted", "duration": "90+ min", "music": "Podcasts/audiobooks", "chat_style": "A bit of conversation is nice", "spotting": "Always happy to spot", "consistency": "Whenever I can", "gender_pref": "No preference"}, {"id": 1012, "first": "Morgan", "gender": "female", "year": "Senior", "major": "Kinesiology", "goal": "General fitness", "equipment": "Mixed", "preferred_time": "Midday (10am-1pm)", "workout_style": "Chill and social", "social_style": "Very extroverted", "duration": "90+ min", "music": "Rock/metal", "chat_style": "Mostly focused, some chat", "spotting": "Always happy to spot", "consistency": "3-4x per week", "gender_pref": "Women only"}, {"id": 1014, "first": "Aaron", "gender": "male", "year": "Junior", "major": "Finance", "goal": "Improve cardio", "equipment": "Free weights", "preferred_time": "Morning (8-10am)", "workout_style": "Moderate pace", "social_style": "Ambivert", "duration": "30-45 min", "music": "Hip-hop", "chat_style": "Love chatting between sets", "spotting": "Prefer not to spot others", "consistency": "Every day", "gender_pref": "No preference"}, {"id": 1024, "first": "Kevin", "gender": "male", "year": "Senior", "major": "Marketing", "goal": "Improve cardio", "equipment": "Free weights", "preferred_time": "Evening (4-7pm)", "workout_style": "Chill and social", "social_style": "Ambivert", "duration": "75-90 min", "music": "Podcasts/audiobooks", "chat_style": "I prefer to stay in the zone", "spotting": "Prefer not to spot others", "consistency": "Whenever I can", "gender_pref": "Any gender"}, {"id": 1019, "first": "Felix", "gender": "male", "year": "Sophomore", "major": "Nursing", "goal": "Increase strength", "equipment": "Bodyweight", "preferred_time": "Afternoon (1-4pm)", "workout_style": "Solo focused", "social_style": "Somewhat extroverted", "duration": "75-90 min", "music": "No preference", "chat_style": "Love chatting between sets", "spotting": "Always happy to spot", "consistency": "Whenever I can", "gender_pref": "No preference"}, {"id": 1029, "first": "Sage", "gender": "non-binary", "year": "Sophomore", "major": "Environmental Studies", "goal": "Flexibility & mobility", "equipment": "Machines", "preferred_time": "Midday (10am-1pm)", "workout_style": "Chill and social", "social_style": "Ambivert", "duration": "30-45 min", "music": "No preference", "chat_style": "Love chatting between sets", "spotting": "Prefer not to spot others", "consistency": "5-6x per week", "gender_pref": "No preference"}, {"id": 1025, "first": "Liam", "gender": "male", "year": "Freshman", "major": "Communication", "goal": "Improve cardio", "equipment": "Cardio", "preferred_time": "Evening (4-7pm)", "workout_style": "High intensity", "social_style": "Ambivert", "duration": "60-75 min", "music": "Hip-hop", "chat_style": "Love chatting between sets", "spotting": "Sometimes, if asked", "consistency": "5-6x per week", "gender_pref": "Any gender"}, {"id": 1021, "first": "Hunter", "gender": "male", "year": "Junior", "major": "Art", "goal": "Lose weight", "equipment": "Cardio", "preferred_time": "Late evening (7-10pm)", "workout_style": "Moderate pace", "social_style": "Ambivert", "duration": "90+ min", "music": "Pop", "chat_style": "Mostly focused, some chat", "spotting": "Sometimes, if asked", "consistency": "1-2x per week", "gender_pref": "Any gender"}, {"id": 1008, "first": "Isabella", "gender": "female", "year": "Freshman", "major": "Finance", "goal": "Lose weight", "equipment": "Machines", "preferred_time": "Midday (10am-1pm)", "workout_style": "Moderate pace", "social_style": "Very extroverted", "duration": "45-60 min", "music": "Hip-hop", "chat_style": "A bit of conversation is nice", "spotting": "Always happy to spot", "consistency": "Every day", "gender_pref": "Any gender"}, {"id": 1010, "first": "Kayla", "gender": "female", "year": "Junior", "major": "Education", "goal": "Improve cardio", "equipment": "Mixed", "preferred_time": "Morning (8-10am)", "workout_style": "High intensity", "social_style": "Very introverted", "duration": "75-90 min", "music": "Hype/EDM", "chat_style": "Love chatting between sets", "spotting": "Always happy to spot", "consistency": "5-6x per week", "gender_pref": "Any gender"}, {"id": 1016, "first": "Carlos", "gender": "male", "year": "Junior", "major": "Nursing", "goal": "Flexibility & mobility", "equipment": "Free weights", "preferred_time": "Early morning (6-8am)", "workout_style": "Circuit training", "social_style": "Somewhat extroverted", "duration": "75-90 min", "music": "Pop", "chat_style": "Love chatting between sets", "spotting": "Sometimes, if asked", "consistency": "Every day", "gender_pref": "Any gender"}, {"id": 1009, "first": "Jade", "gender": "female", "year": "Senior", "major": "Marketing", "goal": "General fitness", "equipment": "Bodyweight", "preferred_time": "Afternoon (1-4pm)", "workout_style": "Circuit training", "social_style": "Very introverted", "duration": "60-75 min", "music": "Podcasts/audiobooks", "chat_style": "Love chatting between sets", "spotting": "Sometimes, if asked", "consistency": "Whenever I can", "gender_pref": "Women only"}, {"id": 1007, "first": "Hannah", "gender": "female", "year": "Freshman", "major": "Business Administration", "goal": "Increase strength", "equipment": "Machines", "preferred_time": "Early morning (6-8am)", "workout_style": "High intensity", "social_style": "Somewhat extroverted", "duration": "30-45 min", "music": "No preference", "chat_style": "I prefer to stay in the zone", "spotting": "Always happy to spot", "consistency": "1-2x per week", "gender_pref": "Women only"}, {"id": 1015, "first": "Ben", "gender": "male", "year": "Freshman", "major": "Mechanical Engineering", "goal": "Lose weight", "equipment": "Cardio", "preferred_time": "Morning (8-10am)", "workout_style": "Chill and social", "social_style": "Very extroverted", "duration": "90+ min", "music": "No preference", "chat_style": "I prefer to stay in the zone", "spotting": "Always happy to spot", "consistency": "3-4x per week", "gender_pref": "Any gender"}, {"id": 1020, "first": "Grant", "gender": "male", "year": "Junior", "major": "Mechanical Engineering", "goal": "Improve cardio", "equipment": "Cardio", "preferred_time": "Late evening (7-10pm)", "workout_style": "Circuit training", "social_style": "Somewhat extroverted", "duration": "90+ min", "music": "Podcasts/audiobooks", "chat_style": "Mostly focused, some chat", "spotting": "Prefer not to spot others", "consistency": "5-6x per week", "gender_pref": "Men only"}, {"id": 1030, "first": "Jordan", "gender": "non-binary", "year": "Senior", "major": "Political Science", "goal": "Increase strength", "equipment": "Machines", "preferred_time": "Early morning (6-8am)", "workout_style": "Solo focused", "social_style": "Somewhat introverted", "duration": "75-90 min", "music": "No preference", "chat_style": "I prefer to stay in the zone", "spotting": "Prefer not to spot others", "consistency": "1-2x per week", "gender_pref": "No preference"}, {"id": 1005, "first": "Faith", "gender": "female", "year": "Senior", "major": "Political Science", "goal": "Increase strength", "equipment": "Free weights", "preferred_time": "Early morning (6-8am)", "workout_style": "High intensity", "social_style": "Somewhat introverted", "duration": "30-45 min", "music": "No preference", "chat_style": "Mostly focused, some chat", "spotting": "Sometimes, if asked", "consistency": "Every day", "gender_pref": "Women only"}, {"id": 1011, "first": "Lily", "gender": "female", "year": "Freshman", "major": "Mechanical Engineering", "goal": "Flexibility & mobility", "equipment": "Machines", "preferred_time": "Late evening (7-10pm)", "workout_style": "High intensity", "social_style": "Somewhat introverted", "duration": "45-60 min", "music": "Hype/EDM", "chat_style": "I prefer to stay in the zone", "spotting": "Sometimes, if asked", "consistency": "1-2x per week", "gender_pref": "Women only"}, {"id": 1003, "first": "Danielle", "gender": "female", "year": "Freshman", "major": "Sociology", "goal": "General fitness", "equipment": "Machines", "preferred_time": "Late evening (7-10pm)", "workout_style": "Chill and social", "social_style": "Very extroverted", "duration": "30-45 min", "music": "Podcasts/audiobooks", "chat_style": "I prefer to stay in the zone", "spotting": "Always happy to spot", "consistency": "Whenever I can", "gender_pref": "Any gender"}];
+const AC=['#003F6B','#007A8C','#1B5E20','#4A148C','#B71C1C','#E65100','#1565C0','#006064'];
+const sS={};const cH={};let cCI=null;
+function tS(){document.getElementById('st').classList.toggle('open');document.getElementById('psrv').classList.toggle('open');}
+function sp(el,g,single){
+  var pills=document.querySelectorAll('#'+g+' .pl');
+  if(single){pills.forEach(function(p){p.classList.remove('sel');});}
+  el.classList.toggle('sel');
+  if(single&&!el.classList.contains('sel'))el.classList.add('sel');
+  if(!sS[g])sS[g]=[];
+  if(single){sS[g]=[el.textContent.trim()];}
+  else{var v=el.textContent.trim();if(el.classList.contains('sel')){if(!sS[g].includes(v))sS[g].push(v);}else{sS[g]=sS[g].filter(function(x){return x!==v;});}}
+}
+function gS(g){return sS[g]||[];}
+function scM(s){
+  var score=0;var on=[];
+  var mg=document.getElementById('s-mg').value;
+  var pg=gS('pg-gender')[0]||'';
+  if(pg==='Women only'&&s.gender!=='female')return null;
+  if(pg==='Men only'&&s.gender!=='male')return null;
+  if(pg==='Non-binary / gender-diverse'&&s.gender!=='non-binary')return null;
+  if(mg){if(s.gender_pref==='Women only'&&mg!=='female')return null;if(s.gender_pref==='Men only'&&mg!=='male')return null;}
+  var d=gS('pg-dur')[0];if(d&&d===s.duration){score+=20;on.push('Same session length ('+d+')');}else if(d)score+=5;
+  var socmap={'Very extroverted — I love meeting people':'Very extroverted','Somewhat extroverted':'Somewhat extroverted','Ambivert — depends on the day':'Ambivert','Somewhat introverted':'Somewhat introverted','Very introverted — quiet and focused':'Very introverted'};
+  var ss=gS('pg-soc')[0];if(ss&&socmap[ss]===s.social_style){score+=20;on.push('Same social energy ('+s.social_style+')');}
+  var ch=gS('pg-chat')[0];if(ch&&ch===s.chat_style){score+=18;on.push('Same conversation style');}
+  var st=gS('pg-sty');if(st.length&&st.includes(s.workout_style)){score+=18;on.push('Same workout style ('+s.workout_style+')');}
+  var mu=gS('pg-mus')[0];if(mu&&(mu==='No preference'||mu===s.music)){score+=12;on.push('Compatible music taste');}
+  var co=gS('pg-con')[0];if(co&&co===s.consistency){score+=12;on.push('Similar gym frequency ('+s.consistency+')');}
+  var ti=gS('pg-tim');if(ti.length&&!ti.includes('Any time works')){if(ti.includes(s.preferred_time)){score+=15;on.push('Same preferred time ('+s.preferred_time+')');}}else if(ti.includes('Any time works'))score+=8;
+  return{score:score,on:on};
+}
+function rPM(){
+  var res=[];
+  STUDENTS.forEach(function(s){var m=scM(s);if(m!==null)res.push({student:s,score:m.score,on:m.on});});
+  res.sort(function(a,b){return b.score-a.score;});
+  var top=res.slice(0,6);
+  document.getElementById('mr').style.display='block';
+  if(!top.length){document.getElementById('ml').innerHTML='<div class="card" style="text-align:center;padding:2rem;color:var(--ink2)">No matches found. Try widening your gender preference or selecting more options.</div>';document.getElementById('mc').textContent='';return;}
+  var mx=top[0].score||1;
+  document.getElementById('mc').textContent='Showing top '+top.length+' matches from '+STUDENTS.length+' WWU students';
+  document.getElementById('ml').innerHTML=top.map(function(m,i){
+    var s=m.student;var pct=Math.min(99,Math.round((m.score/mx)*95)+4);var c=AC[i%AC.length];
+    return '<div class="mc"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="display:flex;align-items:center;gap:12px"><div class="ma" style="background:'+c+'">'+s.first.charAt(0)+'</div><div><div class="mn">'+s.first+'</div><div class="mm"><span class="od"></span>'+s.year+' &bull; '+s.major+' &bull; WWU Student</div></div></div><div class="mp">'+pct+'%<small>Match</small></div></div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">'+m.on.slice(0,4).map(function(a){return '<span class="at">&#10003; '+a+'</span>';}).join('')+(m.on.length===0?'<span style="font-size:13px;color:var(--ink3)">General compatibility</span>':'')+'</div><div style="display:flex;gap:8px"><button class="btn btn-navy btn-sm" onclick="oM('+s.id+',\'' +s.first+ '\',\'' +s.year+ '\',\'' +s.major+ '\')">&#9993; Message '+s.first+'</button><button class="btn btn-ghost btn-sm" onclick="showToast(\'Profile saved! Message '+s.first+' any time.\')">&#9734; Save</button></div></div>';
+  }).join('');
+  document.getElementById('mr').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('st').classList.remove('open');document.getElementById('psrv').classList.remove('open');
+  showToast('Found '+top.length+' compatible Vikings!');
+}
+function clrS(){Object.keys(sS).forEach(function(k){sS[k]=[];});document.querySelectorAll('.pl').forEach(function(p){p.classList.remove('sel');});document.getElementById('mr').style.display='none';showToast('Survey cleared.');}
+function oM(id,first,year,major){
+  cCI=id;if(!cH[id])cH[id]=[];
+  document.getElementById('mt').textContent='Message '+first;
+  document.getElementById('msb').innerHTML='<span class="od"></span>'+year+' &bull; '+major+' &bull; WWU Student';
+  rC(id);document.getElementById('mi').value='';document.getElementById('msgm').classList.add('open');
+}
+function cM(){document.getElementById('msgm').classList.remove('open');cCI=null;}
+function rC(id){
+  var h=cH[id]||[];var c=document.getElementById('chist');
+  if(!h.length){c.innerHTML='<p style="text-align:center;font-size:13px;color:var(--ink3);padding:.5rem">No messages yet. Say hi!</p>';return;}
+  c.innerHTML=h.map(function(m){return '<div class="cm'+(m.f==='y'?' s':'')+'"><div class="cb '+(m.f==='y'?'s':'r')+'">'+m.t+'</div><div class="ct">'+m.ts+'</div></div>';}).join('');
+  c.scrollTop=c.scrollHeight;
+}
+var AR=["Hey! That's so cool you found me on RecSync! I'm usually there around that time too :)","Omg yes, I've been looking for a gym buddy! When are you free this week?","That works perfectly for me! I usually start with weights then cardio. Sound good?","For sure! I'll look for you by the squat racks","Awesome! I'm fairly new to WWU so it'll be nice to actually meet someone at the Rec.","Haha same, I hate going alone. Let's figure out a day that works!","I'm usually there Tue/Thu evenings -- does that work?","Yes!! This app is honestly so useful. See you there!"];
+var rI=0;
+function sM(){
+  var inp=document.getElementById('mi');var txt=inp.value.trim();if(!txt)return;
+  var id=cCI;if(!cH[id])cH[id]=[];
+  var now=new Date();var ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  cH[id].push({f:'y',t:txt,ts:ts});inp.value='';rC(id);
+  setTimeout(function(){var r=AR[rI%AR.length];rI++;var ts2=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});cH[id].push({f:'t',t:r,ts:ts2});rC(id);},1000+Math.random()*900);
+  showToast('Message sent!');
+}
+document.addEventListener('DOMContentLoaded',function(){
+  var m=document.getElementById('msgm');
+  if(m)m.addEventListener('click',function(e){if(e.target===this)cM();});
+  var mi=document.getElementById('mi');
+  if(mi)mi.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sM();}});
+});
+
+</script>
+</body>
+</html>
